@@ -26,6 +26,7 @@
 
 //  Time complexity: O(n)   -   Loop through list of length n three times
 //  Space complexity: O(1)  -   Only using 3 variables, ptr to head, and 3 ints for first/second/len
+//  Solved in 20 minutes
 
 
 class Solution {
