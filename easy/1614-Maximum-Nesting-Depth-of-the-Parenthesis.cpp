@@ -10,6 +10,9 @@
 //  Space Complexity - O(n), worst case the entire input is parenthesis
 //  Solved in 5 minutes oh yeah
 
+//  Looked at solutions, realized you can optimize to O(1) space by just
+//  keeping a curDepth int and ++/-- it
+
 class Solution {
 public:
     int maxDepth(string s) {
