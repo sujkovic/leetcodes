@@ -19,18 +19,32 @@ public:
 };
 */
 
-//  keep a map of all the nodes youve seen so far
-//  if you hit one you've seen, ignore
-//  loop through each node in the graph, adding all its neighbors to its new node
+//  keep map<ognode, newnode>
+//  dfs from root, exploring each node
+//  for each node from oggraph (dfs call)
+//      make a new node
+//      set new node value to ognode value
+//      make a new vector of nodes (adj list)
+//      loop through each node in ognode adj list
+//          if it hasnt been visited (in the map)
+//              add it to adj list and make a dfs call on it
+//          if it has been visited
+//              add map[ogNode] (new node) to the current adj list
+//      return new node
+
+//  Solved in 14 min
+//  Time - O(V + E)
+//  Space - O(V) - Storing V pointers in a map
 
 class Solution
 {
 public:
     Node *dfs(Node *node, unordered_map<Node *, Node *> &map)
     {
-        vector<Node *> adjList;
-        Node *newNode = new Node(node->val);
+        Node *newNode = new Node();
         map[node] = newNode;
+        vector<Node *> adjList;
+        newNode->val = node->val;
 
         for (int i = 0; i < node->neighbors.size(); i++)
         {
@@ -44,7 +58,6 @@ public:
         newNode->neighbors = adjList;
         return newNode;
     }
-
     Node *cloneGraph(Node *node)
     {
         if (!node)
