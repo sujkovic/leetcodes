@@ -53,60 +53,50 @@ public:
 //  Reattempting but with a node struct and fresh mind after the above abomination yesterday
 //  Solved in 32 min RAHHHHH
 //  Added ranking in another 5 minutes but it had zero effect on the runtime
-//  Time - O(nlogn) due to sorting
+//  Time - O(n^2 * logn) due to sorting
 //  Space - O(n)
 //  Im proud of this one didnt need to google a single thing for struct/comparator syntax or dsu/kruskals stuff
 
-struct Node
-{
+/*
+struct Node {
     int x;
     int y;
     int id;
     Node(int x, int y, int id) : x(x), y(y), id(id) {}
 };
 
-class DSU
-{
+class DSU {
 private:
     vector<Node> parent;
     vector<int> rank;
-
 public:
-    DSU(vector<vector<int>> &points)
-    {
-        for (int i = 0; i < points.size(); i++)
-        {
+    DSU(vector<vector<int>>& points) {
+        for (int i = 0; i < points.size(); i++) {
             Node node(points[i][0], points[i][1], i);
             parent.push_back(node);
             rank.push_back(1);
         }
     }
-    Node findRoot(Node node)
-    {
-        if (node.id == parent[node.id].id)
-        {
+    Node findRoot(Node node) {
+        if (node.id == parent[node.id].id) {
             return node;
         }
         parent[node.id] = findRoot(parent[node.id]);
         return parent[node.id];
     }
-    bool unionSubset(Node x, Node y)
-    {
+    bool unionSubset(Node x, Node y) {
         Node parentX = findRoot(x);
         Node parentY = findRoot(y);
 
-        if (parentX.id == parentY.id)
-        {
+        if (parentX.id == parentY.id) {
             return false;
         }
 
-        if (rank[parentX.id] > rank[parentY.id])
-        {
+        if (rank[parentX.id] > rank[parentY.id]) {
             parent[parentY.id] = parentX;
             rank[parentX.id] += rank[parentY.id];
         }
-        else
-        {
+        else {
             parent[parentX.id] = parentY;
             rank[parentY.id] += rank[parentX.id];
         }
@@ -114,21 +104,17 @@ public:
     }
 };
 
-class Solution
-{
+class Solution {
 public:
-    int minCostConnectPoints(vector<vector<int>> &points)
-    {
+    int minCostConnectPoints(vector<vector<int>>& points) {
         DSU dsu(points);
         vector<pair<Node, Node>> edges;
         int costToConnectPoints = 0;
         int edgesAdded = 0;
 
         //  Create all possible edges
-        for (int i = 0; i < points.size(); i++)
-        {
-            for (int j = i + 1; j < points.size(); j++)
-            {
+        for (int i = 0; i < points.size(); i++) {
+            for (int j = i + 1; j < points.size(); j++) {
                 Node node1(points[i][0], points[i][1], i);
                 Node node2(points[j][0], points[j][1], j);
                 edges.push_back({node1, node2});
@@ -136,25 +122,78 @@ public:
         }
 
         //  Sort edges by manhattan distance
-        sort(edges.begin(), edges.end(), [](const pair<Node, Node> &edge1, const pair<Node, Node> &edge2)
-             {
+        sort(edges.begin(), edges.end(), [](const pair<Node, Node> &edge1, const pair<Node, Node> &edge2) {
             int dist1 = abs(edge1.first.x - edge1.second.x) + abs(edge1.first.y - edge1.second.y);
             int dist2 = abs(edge2.first.x - edge2.second.x) + abs(edge2.first.y - edge2.second.y);
-            return dist1 < dist2; });
+            return dist1 < dist2;
+        });
 
-        for (int i = 0; i < edges.size(); i++)
-        {
-            if (edgesAdded == points.size())
-            {
+        for (int i = 0; i < edges.size(); i++) {
+            if (edgesAdded == points.size()) {
                 break;
             }
-            if (dsu.unionSubset(edges[i].first, edges[i].second))
-            {
+            if (dsu.unionSubset(edges[i].first, edges[i].second)) {
                 costToConnectPoints += (abs(edges[i].first.x - edges[i].second.x) + abs(edges[i].first.y - edges[i].second.y));
                 edgesAdded++;
             }
         }
 
         return costToConnectPoints;
+    }
+};
+*/
+
+//  Reattempting with Prim's a few hours later
+//  Idea is bfs from a source node, adding the smallest connected edge to the cur node
+//  that does not connect to a visited node
+//  to avoid the node headache above ill just use {edge weight, points index}
+//  keep a visited set and a min heap of this data type ^
+//  add the first point to the queue to initialize as {0, 0} (weight 0 sincen no edge yet)
+//  while queue not empty and not all points connected
+//      cur node = heap top
+//      add cur node to visited
+//      add cur node dist to result
+//      push all neighbors that havent been visited to the queue w/ their dist from cur node
+//      pop cur node
+//  return res
+
+//  Solved in around 45 min
+//  O(n^2 * logn) time and O(n) space like kruskals
+
+class Solution
+{
+public:
+    int minCostConnectPoints(vector<vector<int>> &points)
+    {
+        unordered_set<int> visited;
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> heap;
+        int totalCost = 0;
+        heap.push({0, 0});
+
+        while (!heap.empty() && visited.size() < points.size())
+        {
+            int curDist = heap.top().first;
+            int curNode = heap.top().second;
+            if (visited.find(curNode) != visited.end())
+            {
+                heap.pop();
+                continue;
+            }
+            heap.pop();
+            visited.insert(curNode);
+            totalCost += curDist;
+
+            for (int i = 0; i < points.size(); i++)
+            {
+                if (visited.find(i) == visited.end())
+                {
+                    int newDist = abs(points[i][0] - points[curNode][0]) + abs(points[i][1] - points[curNode][1]);
+                    // cout << "(" << points[i][0] << " " << points[i][1] << "), (" << points[curNode][0] << " " << points[curNode][1] << ") dist " << newDist << endl;
+                    heap.push({newDist, i});
+                }
+            }
+        }
+
+        return totalCost;
     }
 };
