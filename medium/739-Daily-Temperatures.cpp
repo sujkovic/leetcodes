@@ -1,3 +1,5 @@
+//  Solved September 2023
+
 //  brute force just do double for loop 
 
 //  Finished in 4 minutes, TLE as expected
@@ -72,5 +74,44 @@ public:
        }
 
        return res;
+    }
+};
+
+
+//  Solved November 2024
+
+//  73 74 75 71 69 72 76 73
+//  1  1  4  2  1  1  0  0
+
+//  initialize a results vec of temperatures size of all 0's
+//  stack<pair<temperature, index>>
+//  for i = 0 to temps size in temps
+//      while cur temp > stack top temp
+//          res[stack top index] = i - stack top index
+//          pop top of stack
+//      push curtemp, i to stack
+//  return res
+
+//  Solved in 14 min
+//  Time - O(n)
+//  Space - O(n)
+
+class Solution {
+public:
+    vector<int> dailyTemperatures(vector<int>& temperatures) {
+        int tempsLength = temperatures.size();
+        stack<pair<int, int>> stack;
+        vector<int> res(tempsLength, 0);
+
+        for (int i = 0; i < tempsLength; i++) {
+            while (!stack.empty() && temperatures[i] > stack.top().first) {
+                res[stack.top().second] = i - stack.top().second;
+                stack.pop();
+            }
+
+            stack.push({temperatures[i], i});
+        }
+
+        return res;
     }
 };
