@@ -14,7 +14,7 @@
 //      do nothing
 
 //  Time - O(n + (m * x))  where x is the unionSubsets time complexity (i have zero clue what it is)
-//                  like it seems to be alpha(n) which goes to 5 so is constant?? but leetcode says logn
+//                  like it seems to be alpha(n) which goes to 5 so is constant?? but leetcode says logn.
 //  Space - O(n)
 
 class UnionFind {
